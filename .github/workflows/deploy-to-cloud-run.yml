@@ -20,8 +20,9 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          gcloud builds submit
-              --tag ${{ secrets.IMAGE_TAG }} .
+          gcloud builds submit . \
+              --suppress-logs \
+              --tag ${{ secrets.IMAGE_TAG }}
 
       - name: Deploy to Cloud Run
         run: |
