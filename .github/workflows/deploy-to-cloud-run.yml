@@ -35,7 +35,7 @@ jobs:
 
       - name: Download Cloud SQL Proxy
         run: |
-          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.11.3/cloud-sql-proxy.linux.amd64
+          wget https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.11.3/cloud-sql-proxy.linux.amd64 -O cloud_sql_proxy -q
           chmod +x cloud_sql_proxy
 
       - name: Migrate via Cloud SQL Proxy
