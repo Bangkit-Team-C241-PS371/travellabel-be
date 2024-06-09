@@ -40,4 +40,4 @@ jobs:
 
       - name: Migrate via Cloud SQL Proxy
         run: | # https://github.com/GoogleCloudPlatform/cloud-sql-proxy/issues/1989#issuecomment-1764900574
-          ./cloud_sql_proxy -instances=${{ secrets.GCP_SQL_CONNECTION_NAME }}=tcp:5432 & npx prisma migrate deploy
+          ./cloud_sql_proxy --port 5432 ${{ secrets.GCP_SQL_CONNECTION_NAME }} & npx prisma migrate deploy
