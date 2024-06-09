@@ -13,10 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// TODO: masih temporary schema, belom fix
 model User {
   id        String  @default(uuid()) @id
   email     String  @unique
   username  String  @unique
   password  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
