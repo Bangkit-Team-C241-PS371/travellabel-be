@@ -38,10 +38,6 @@ jobs:
           wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
           chmod +x cloud_sql_proxy
 
-      - name: Initialize Cloud SQL Proxy connection
+      - name: Initialize and Migrate via Cloud SQL Proxy connection
         run: |
-          ./cloud_sql_proxy -instances=${{ secrets.GCP_SQL_CONNECTION_NAME }}=tcp:5432
-
-      - name: Migrate Cloud SQL database using Prisma Migrations
-        run: |
-          npx prisma migrate deploy
+          ./cloud_sql_proxy -instances=${{ secrets.GCP_SQL_CONNECTION_NAME }}=tcp:5432 & npx prisma migrate deploy
