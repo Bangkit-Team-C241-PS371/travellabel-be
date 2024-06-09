@@ -3,6 +3,10 @@ name: Build & Deploy to Cloud Run
   push:
     branches:
       - main
+
+env:
+  DATABASE_URL: ${{ secrets.SQL_PROXY_DATABASE_URL }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
