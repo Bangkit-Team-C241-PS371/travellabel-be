@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Authenticate with service account
         uses: google-github-actions/auth@v2
@@ -38,12 +38,6 @@ jobs:
           wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy -q --show-progress
           chmod +x cloud_sql_proxy
 
-      - name: Initialize Cloud SQL Proxy connection
+      - name: Migrate via Cloud SQL Proxy
         run: | # https://github.com/GoogleCloudPlatform/cloud-sql-proxy/issues/1989#issuecomment-1764900574
-          nohup ./cloud_sql_proxy -instances=${{ secrets.GCP_SQL_CONNECTION_NAME }}=tcp:5432 > cloud-sql-proxy.out 2> cloud-sql-proxy.err < /dev/null &
-          echo $!
-          echo CLOUD_SQL_PROXY_PID=$(echo $!) >> $GITHUB_ENV
-
-      - name: Migrate Prisma Schema to Cloud SQL
-        run: |
-          npx prisma migrate deploy
+          ./cloud_sql_proxy -instances=${{ secrets.GCP_SQL_CONNECTION_NAME }}=tcp:5432 & npx prisma migrate deploy
