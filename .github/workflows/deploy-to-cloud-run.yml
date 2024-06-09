@@ -8,7 +8,7 @@ env:
   DATABASE_URL: ${{ secrets.SQL_PROXY_DATABASE_URL }}
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,11 +27,35 @@ jobs:
           gcloud builds submit --tag ${{ secrets.IMAGE_TAG }} \
               --gcs-log-dir gs://travellabel_cloudbuild_logs
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate with service account
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy ${{ secrets.GCP_SERVICE_NAME }} \
               --image ${{ secrets.IMAGE_TAG }} \
               --region asia-southeast2
+
+  migrate:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate with service account
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
       - name: Download Cloud SQL Proxy
         run: |
@@ -39,5 +63,5 @@ jobs:
           chmod +x cloud_sql_proxy
 
       - name: Migrate via Cloud SQL Proxy
-        run: | # https://github.com/GoogleCloudPlatform/cloud-sql-proxy/issues/1989#issuecomment-1764900574
+        run: |
           ./cloud_sql_proxy --port 5432 ${{ secrets.GCP_SQL_CONNECTION_NAME }} & npx prisma migrate deploy
