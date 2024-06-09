@@ -28,3 +28,16 @@ jobs:
           gcloud run deploy ${{ secrets.GCP_SERVICE_NAME }} \
               --image ${{ secrets.IMAGE_TAG }} \
               --region asia-southeast2
+
+      - name: Download Cloud SQL Proxy
+        run: |
+          wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+          chmod +x cloud_sql_proxy
+
+      - name: Initialize Cloud SQL Proxy connection
+        run: |
+          ./cloud_sql_proxy -instances=${{ secrets.GCP_SQL_CONNECTION_NAME }}=tcp:5432
+
+      - name: Migrate Cloud SQL database using Prisma Migrations
+        run: |
+          npx prisma migrate deploy
