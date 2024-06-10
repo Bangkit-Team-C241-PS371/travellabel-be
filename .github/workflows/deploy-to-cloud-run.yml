@@ -25,7 +25,7 @@ jobs:
       - name: Configure gcloud build
         run: | # enable build layer caching with Kaniko
           gcloud config set builds/use_kaniko True
-          gcloud config set builds/kaniko_cache_ttl 6h
+          gcloud config set builds/kaniko_cache_ttl 6
 
       - name: Build and push Docker image
         run: |
