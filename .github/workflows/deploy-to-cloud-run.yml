@@ -4,9 +4,6 @@ name: Build & Deploy to Cloud Run
     branches:
       - main
 
-env:
-  DATABASE_URL: ${{ secrets.SQL_PROXY_DATABASE_URL }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -53,9 +50,17 @@ jobs:
   migrate:
     needs: deploy
     runs-on: ubuntu-latest
+
+    # set up database_url env for the prisma migration
+    env:
+      DATABASE_URL: ${{ secrets.SQL_PROXY_DATABASE_URL }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: | # checkout only the prisma folder
+            prisma
 
       - name: Authenticate with service account
         uses: google-github-actions/auth@v2
