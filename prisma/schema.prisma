@@ -14,10 +14,107 @@ datasource db {
 }
 
 model User {
-  id        String  @default(uuid()) @id
-  email     String  @unique
-  username  String  @unique
-  password  String
+  id       String @id @default(uuid())
+  email    String @unique
+  username String @unique
+  password String
+
+  bookmarkedLocations      Location[]
+
+  createdReviews           Review[]
+  reviewInteractions       ReviewInteraction[]
+
+  createdDiscussions       Discussion[]
+  createdDiscussionReplies DiscussionReply[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Location {
+  id String @id @default(uuid())
+
+  label       String
+  description String
+
+  // location stored in lat,lon pair
+  lat Decimal
+  lon Decimal
+
+  // location rating and how many people rated it
+  rating Decimal @default(0)
+  raters Int     @default(0)
+
+  bookmarkerUsers User[]
+  reviews         Review[]
+  discussions     Discussion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id String @id @default(uuid())
+
+  location   Location @relation(fields: [locationId], references: [id])
+  locationId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  rating  Decimal
+  content String
+
+  // nanti buat dapet likes/dislikes counter bisa count ini aja per type
+  interactions ReviewInteraction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum InteractionType {
+  LIKE
+  DISLIKE
+}
+
+model ReviewInteraction {
+  id String @id @default(uuid())
+
+  type InteractionType
+
+  review   Review @relation(fields: [reviewId], references: [id])
+  reviewId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+}
+
+model Discussion {
+  id String @id @default(uuid())
+
+  location   Location @relation(fields: [locationId], references: [id])
+  locationId String
+
+  creator   User   @relation(fields: [creatorId], references: [id])
+  creatorId String
+
+  discussionReplies DiscussionReply[]
+
+  title   String
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DiscussionReply {
+  id String @id @default(uuid())
+
+  creator   User   @relation(fields: [creatorId], references: [id])
+  creatorId String
+
+  discussion   Discussion @relation(fields: [discussionId], references: [id])
+  discussionId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
