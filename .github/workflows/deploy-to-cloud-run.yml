@@ -3,12 +3,13 @@ name: Build & Deploy to Cloud Run
   push:
     branches:
       - main
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Authenticate with service account
         uses: google-github-actions/auth@v2
@@ -18,13 +19,59 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Configure gcloud build
+        run: | # enable build layer caching with Kaniko
+          gcloud config set builds/use_kaniko True
+          gcloud config set builds/kaniko_cache_ttl 6
+
       - name: Build and push Docker image
         run: |
           gcloud builds submit --tag ${{ secrets.IMAGE_TAG }} \
               --gcs-log-dir gs://travellabel_cloudbuild_logs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate with service account
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy ${{ secrets.GCP_SERVICE_NAME }} \
               --image ${{ secrets.IMAGE_TAG }} \
               --region asia-southeast2
+
+  migrate:
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    # set up database_url env for the prisma migration
+    env:
+      DATABASE_URL: ${{ secrets.SQL_PROXY_DATABASE_URL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: | # checkout only the prisma folder
+            prisma
+
+      - name: Authenticate with service account
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Download Cloud SQL Proxy
+        run: |
+          wget https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.11.3/cloud-sql-proxy.linux.amd64 -O cloud_sql_proxy -q
+          chmod +x cloud_sql_proxy
+
+      - name: Migrate via Cloud SQL Proxy
+        run: |
+          ./cloud_sql_proxy --port 5432 ${{ secrets.GCP_SQL_CONNECTION_NAME }} & npx prisma migrate deploy
