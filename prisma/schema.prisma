@@ -116,6 +116,8 @@ model DiscussionReply {
   discussion   Discussion @relation(fields: [discussionId], references: [id])
   discussionId String
 
+  content String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
