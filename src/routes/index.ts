@@ -1,10 +1,14 @@
-import { Router } from "express";
-import sampleRouter from "./sample";
+import { Router } from "express"
+import sampleRouter from "./sample"
+import authRouter from "./auth"
 
-// Create a new Router instance
-const router = Router();
+const APIRouter = Router()
 
-// Mount the routers
-router.use("/sample", sampleRouter);
+APIRouter.use("/sample", sampleRouter)
+APIRouter.use("/auth", authRouter)
 
-export default router;
+const mainRouter = Router()
+
+mainRouter.use("/api/v1", APIRouter)
+
+export default mainRouter

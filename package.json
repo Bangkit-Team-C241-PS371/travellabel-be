@@ -15,16 +15,21 @@
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^5.14.0",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "decimal.js": "^10.4.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "http-status-codes": "^2.3.0",
+    "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "nocache": "^4.0.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.12.12",
     "prisma": "^5.14.0",
