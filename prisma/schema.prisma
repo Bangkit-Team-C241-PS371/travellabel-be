@@ -19,10 +19,10 @@ model User {
   username String @unique
   password String
 
-  bookmarkedLocations      Location[]
+  bookmarkedLocations Location[]
 
-  createdReviews           Review[]
-  reviewInteractions       ReviewInteraction[]
+  createdReviews     Review[]
+  reviewInteractions ReviewInteraction[]
 
   createdDiscussions       Discussion[]
   createdDiscussionReplies DiscussionReply[]
