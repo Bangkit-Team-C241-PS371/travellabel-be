@@ -160,6 +160,8 @@ export const resetPasswordHandler = async (req: Request, res: Response) => {
 
   if (!newPassword) {
     return sendErrorResponse(res, 400, "New password is required")
+  } else if (!resetToken) {
+    return sendErrorResponse(res, 400, "Reset token is required")
   }
 
   try {
