@@ -95,3 +95,33 @@ export const getLocationHandler = async (req: Request, res: Response) => {
     return sendErrorResponse(res, 500, "Error while querying location");
   }
 };
+
+export const getDiscussionPerLocationHandler = async (req: Request, res: Response) => {
+  const { locationId } = req.params;
+
+  const location = await db.location.findUnique({
+    where: {
+      id: locationId,
+    },
+  });
+
+  if (!location) {
+    return sendErrorResponse(
+      res,
+      404,
+      `location with ID ${locationId} not found`
+    );
+  }
+
+  const discussions = await db.discussion.findMany({
+    where: {
+      locationId
+    },
+  });
+
+  return res.send({
+    status: "OK",
+    message: "Discussions fetched successfully",
+    discussions,
+  });
+}
