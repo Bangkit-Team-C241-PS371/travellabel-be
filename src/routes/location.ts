@@ -1,8 +1,8 @@
 import { Router } from "express";
 import {
-    createLocationHandler,
-    getDiscussionPerLocationHandler,
-    getLocationHandler
+  createLocationHandler,
+  getDiscussionPerLocationHandler,
+  getLocationHandler,
 } from "~/handlers/location";
 
 const locationRouter = Router();
