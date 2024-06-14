@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createDiscussionHandler, createDiscussionReplyHandler, getDiscussionRepliesHandler } from "~/handlers/discussion";
+import {
+  createDiscussionHandler,
+  createDiscussionReplyHandler,
+  getDiscussionRepliesHandler,
+} from "~/handlers/discussion";
 
 const discussionRouter = Router();
 

@@ -31,17 +31,17 @@ export const createDiscussionHandler = async (req: Request, res: Response) => {
       data: {
         location: {
           connect: {
-            id: locationId
+            id: locationId,
           },
         },
         creator: {
           connect: {
-            id: creatorId
+            id: creatorId,
           },
         },
         title,
         content,
-      }
+      },
     });
 
     return res.status(201).send({
@@ -54,17 +54,16 @@ export const createDiscussionHandler = async (req: Request, res: Response) => {
   }
 };
 
-export const createDiscussionReplyHandler = async (req: Request, res: Response) => {
+export const createDiscussionReplyHandler = async (
+  req: Request,
+  res: Response
+) => {
   const { discussionId } = req.params;
   const { content } = req.body;
   const { id: creatorId } = req.user;
 
   if (!content) {
-    return sendErrorResponse(
-      res,
-      400,
-      "Bad request: missing content"
-    );
+    return sendErrorResponse(res, 400, "Bad request: missing content");
   }
 
   const discussion = await db.discussion.findUnique({
@@ -87,15 +86,15 @@ export const createDiscussionReplyHandler = async (req: Request, res: Response) 
         creator: {
           connect: {
             id: creatorId,
-          }
+          },
         },
         discussion: {
           connect: {
             id: discussionId,
-          }
+          },
         },
         content,
-      }
+      },
     });
 
     return res.status(201).send({
@@ -106,9 +105,12 @@ export const createDiscussionReplyHandler = async (req: Request, res: Response) 
   } catch (e) {
     return sendErrorResponse(res, 500, "Error while creating discussion reply");
   }
-}
+};
 
-export const getDiscussionRepliesHandler = async (req: Request, res: Response) => {
+export const getDiscussionRepliesHandler = async (
+  req: Request,
+  res: Response
+) => {
   const { discussionId } = req.params;
 
   const discussion = await db.discussion.findUnique({
@@ -127,17 +129,17 @@ export const getDiscussionRepliesHandler = async (req: Request, res: Response) =
 
   const replies = await db.discussionReply.findMany({
     where: {
-      discussionId
+      discussionId,
     },
     include: {
       creator: {
         select: {
           id: true,
           username: true,
-          email: true
-        }
-      }
-    }
+          email: true,
+        },
+      },
+    },
   });
 
   return res.send({
@@ -145,4 +147,4 @@ export const getDiscussionRepliesHandler = async (req: Request, res: Response) =
     message: "Replies fetched successfully",
     replies,
   });
-}
+};
