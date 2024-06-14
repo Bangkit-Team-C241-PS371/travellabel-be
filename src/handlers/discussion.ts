@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
 import { sendErrorResponse } from "~/errors/responseError";
-
-const db = new PrismaClient();
+import { db } from "~/utils/db";
 
 export const createDiscussionHandler = async (req: Request, res: Response) => {
   const { locationId, title, content } = req.body;

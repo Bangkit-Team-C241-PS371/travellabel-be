@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { sendErrorResponse } from "~/errors/responseError";
-
-const db = new PrismaClient();
+import { db } from "~/utils/db";
 
 export const createLocationHandler = async (req: Request, res: Response) => {
   const { label, description, lat, lon } = req.body;

@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-
-const db = new PrismaClient()
+import { db } from "~/utils/db";
 
 export const checkEmailorUsername = async (identifier: string) => {
   if (/\S+@\S+\.\S+/.test(identifier)) {
