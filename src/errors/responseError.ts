@@ -1,9 +1,9 @@
 import { Response } from "express"
-import { getReasonPhrase } from "http-status-codes"
+import { StatusCodes, getReasonPhrase } from "http-status-codes"
 
 export const sendErrorResponse = (
   res: Response,
-  statusCode: number,
+  statusCode: StatusCodes,
   message: string
 ) => {
   return res

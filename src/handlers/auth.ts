@@ -1,5 +1,4 @@
 import { Request, Response } from "express"
-import { PrismaClient } from "@prisma/client"
 import jwt from "jsonwebtoken"
 import {
   checkEmailorUsername,
@@ -8,8 +7,7 @@ import {
   verifyPassword,
 } from "~/utils"
 import { sendErrorResponse } from "~/errors/responseError"
-
-const db = new PrismaClient()
+import { db } from "~/utils/db";
 
 // Register User
 export const registerHandler = async (req: Request, res: Response) => {

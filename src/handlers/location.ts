@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { sendErrorResponse } from "~/errors/responseError";
-
-const db = new PrismaClient();
+import { db } from "~/utils/db";
 
 export const createLocationHandler = async (req: Request, res: Response) => {
   const { label, description, lat, lon } = req.body;
@@ -35,12 +34,20 @@ export const getLocationHandler = async (req: Request, res: Response) => {
   const { searchQuery, minLat, minLon, maxLat, maxLon } = req.body;
 
   // validate min-max constraints if both min and max are specified
-  if ((minLon && maxLon) && minLon > maxLon) {
-    return sendErrorResponse(res, 400, "maxLon must be greater than or equal to minLon");
+  if (minLon && maxLon && minLon > maxLon) {
+    return sendErrorResponse(
+      res,
+      400,
+      "maxLon must be greater than or equal to minLon"
+    );
   }
 
-  if ((minLat && maxLat) && minLat > maxLat) {
-    return sendErrorResponse(res, 400, "maxLat must be greater than or equal to minLat");
+  if (minLat && maxLat && minLat > maxLat) {
+    return sendErrorResponse(
+      res,
+      400,
+      "maxLat must be greater than or equal to minLat"
+    );
   }
 
   // create own custom queryFilter type with all the possible combinations
@@ -90,8 +97,40 @@ export const getLocationHandler = async (req: Request, res: Response) => {
       message: "Locations retrieved successfully",
       locations,
     });
-
   } catch (e) {
     return sendErrorResponse(res, 500, "Error while querying location");
   }
+};
+
+export const getDiscussionPerLocationHandler = async (
+  req: Request,
+  res: Response
+) => {
+  const { locationId } = req.params;
+
+  const location = await db.location.findUnique({
+    where: {
+      id: locationId,
+    },
+  });
+
+  if (!location) {
+    return sendErrorResponse(
+      res,
+      404,
+      `location with ID ${locationId} not found`
+    );
+  }
+
+  const discussions = await db.discussion.findMany({
+    where: {
+      locationId,
+    },
+  });
+
+  return res.send({
+    status: "OK",
+    message: "Discussions fetched successfully",
+    discussions,
+  });
 };

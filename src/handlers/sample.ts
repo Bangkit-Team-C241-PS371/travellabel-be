@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const db = new PrismaClient();
+import { db } from "~/utils/db";
 
 export const sampleHandler = async (req: Request, res: Response) => {
   res.send({
