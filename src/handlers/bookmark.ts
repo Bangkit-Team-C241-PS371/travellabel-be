@@ -68,24 +68,26 @@ export const createBookmarkHandler = async (req: Request, res: Response) => {
   }
 };
 
-export const getBookmarkedLocationsHandler = async (req: Request, res: Response) => {
+export const getBookmarkedLocationsHandler = async (
+  req: Request,
+  res: Response
+) => {
   const { id: userId } = req.user;
 
-  const bookmarkedLocations = await db.user.findUniqueOrThrow({
-    where: {
-      id: userId
-    },
-    select: {
-      bookmarkedLocations: true
-    }
-  });
+  const bookmarkedLocations = await db.user
+    .findUniqueOrThrow({
+      where: {
+        id: userId,
+      },
+    })
+    .bookmarkedLocations();
 
   return res.status(200).send({
     status: "OK",
     message: "Bookmarks fetched successfully",
-    ...bookmarkedLocations, // todo explain in comment why we have to spread it
+    bookmarkedLocations,
   });
-}
+};
 
 export const removeBookmarkHandler = async (req: Request, res: Response) => {
   const { locationId } = req.body;
@@ -151,4 +153,4 @@ export const removeBookmarkHandler = async (req: Request, res: Response) => {
     message: "Location removed from bookmark successfully",
     location,
   });
-}
+};
