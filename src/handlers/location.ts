@@ -10,14 +10,17 @@ export const createLocationHandler = async (req: Request, res: Response) => {
     return sendErrorResponse(res, 400, "Bad request data");
   }
 
+  const decimalLon = new Prisma.Decimal(lon);
+  const decimalLat = new Prisma.Decimal(lat);
+
   // validate geographical constraints
   // lon is -180 <= x <= 180
-  if (lon < -180 || lon > 180) {
+  if (decimalLon.lt(-180) || decimalLon.gt(180)) {
     return sendErrorResponse(res, 400, "Bad request data: invalid longitude value");
   }
 
   // lat is -90 <= x <= 90
-  if (lat < -90 || lat > 90) {
+  if (decimalLat.lt(-90) || decimalLat.gt(90)) {
     return sendErrorResponse(res, 400, "Bad request data: invalid latitude value");
   }
 
@@ -26,8 +29,8 @@ export const createLocationHandler = async (req: Request, res: Response) => {
       data: {
         label,
         description,
-        lat: new Prisma.Decimal(lat),
-        lon: new Prisma.Decimal(lon),
+        lat: decimalLat,
+        lon: decimalLon,
       },
     });
 
