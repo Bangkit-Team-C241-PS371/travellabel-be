@@ -30,10 +30,11 @@ export const createReviewHandler = async (req: Request, res: Response) => {
         rating: new Prisma.Decimal(rating),
         content,
       },
+      include: { location: true },
     });
 
     // Update rating and raters data in Location
-    const updatedLocation = updateRatingRatersLocation(location, rating);
+    const updatedLocation = updateRatingRatersLocation(review.location, rating);
     if (!updatedLocation) {
       return sendErrorResponse(res, 500, "Error while updating Location data");
     }
