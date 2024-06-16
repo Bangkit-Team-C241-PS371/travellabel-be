@@ -7,6 +7,7 @@ import {
   findLocationById,
   findReviewById,
   getReviewWithInteractionCounts,
+  updateRatingRatersLocation,
 } from "~/services/review";
 
 export const createReviewHandler = async (req: Request, res: Response) => {
@@ -21,6 +22,7 @@ export const createReviewHandler = async (req: Request, res: Response) => {
   if (!location) return;
 
   try {
+    // Create a new Review instance
     const review = await db.review.create({
       data: {
         location: { connect: { id: locationId } },
@@ -29,6 +31,12 @@ export const createReviewHandler = async (req: Request, res: Response) => {
         content,
       },
     });
+
+    // Update rating and raters data in Location
+    const updatedLocation = updateRatingRatersLocation(location, rating);
+    if (!updatedLocation) {
+      return sendErrorResponse(res, 500, "Error while updating Location data");
+    }
 
     return res.status(201).send({
       status: "OK",
@@ -60,10 +68,23 @@ export const updateReviewHandler = async (req: Request, res: Response) => {
   }
 
   try {
+    // Update review data
     const updatedReview = await db.review.update({
       where: { id: reviewId },
       data: { rating: new Prisma.Decimal(rating), content },
+      include: {
+        location: true,
+      },
     });
+
+    // Update rating and raters data in Location
+    const updatedLocation = updateRatingRatersLocation(
+      updatedReview.location,
+      rating
+    );
+    if (!updatedLocation) {
+      return sendErrorResponse(res, 500, "Error while updating Location data");
+    }
 
     return res.status(200).send({
       status: "OK",
@@ -81,7 +102,7 @@ export const deleteReviewHandler = async (req: Request, res: Response) => {
 
   const review = await findReviewById(reviewId!, res);
   if (!review) return;
-  if (review.id !== userId) {
+  if (review.userId !== userId) {
     return sendErrorResponse(
       res,
       403,
@@ -91,6 +112,15 @@ export const deleteReviewHandler = async (req: Request, res: Response) => {
 
   try {
     await db.review.delete({ where: { id: reviewId } });
+
+    // Update rating and raters data in Location
+    const updatedLocation = updateRatingRatersLocation(
+      review.location,
+      review.rating.neg()
+    );
+    if (!updatedLocation) {
+      return sendErrorResponse(res, 500, "Error while updating Location data");
+    }
     return res.status(200).send({
       status: "OK",
       message: "Review deleted successfully",

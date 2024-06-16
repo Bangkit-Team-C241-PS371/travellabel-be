@@ -1,6 +1,7 @@
 import { db } from "~/utils/db";
 import { Response } from "express";
 import { sendErrorResponse } from "~/errors/responseError";
+import { Location, Prisma } from "@prisma/client";
 
 export const findLocationById = async (locationId: string, res: Response) => {
   const location = await db.location.findUnique({ where: { id: locationId } });
@@ -12,12 +13,37 @@ export const findLocationById = async (locationId: string, res: Response) => {
 };
 
 export const findReviewById = async (reviewId: string, res: Response) => {
-  const review = await db.review.findUnique({ where: { id: reviewId } });
+  const review = await db.review.findUnique({
+    where: { id: reviewId },
+    include: { location: true },
+  });
   if (!review) {
     sendErrorResponse(res, 404, `Review with ID ${reviewId} not found`);
     return null;
   }
   return review;
+};
+
+export const updateRatingRatersLocation = async (
+  location: Location,
+  rating: Prisma.Decimal
+) => {
+  const { rating: oldAverage, raters: count } = location;
+
+  const totalRating = oldAverage.mul(new Prisma.Decimal(count)).add(rating);
+  const newAverage = totalRating.div(
+    new Prisma.Decimal(rating < new Prisma.Decimal(0.0) ? count - 1 : count + 1)
+  );
+
+  return await db.location.update({
+    where: {
+      id: location.id,
+    },
+    data: {
+      raters: rating < new Prisma.Decimal(0.0) ? count - 1 : count + 1,
+      rating: newAverage,
+    },
+  });
 };
 
 export const checkReviewInteraction = async (
