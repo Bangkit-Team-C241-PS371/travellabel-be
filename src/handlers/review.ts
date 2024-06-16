@@ -43,6 +43,7 @@ export const createReviewHandler = async (req: Request, res: Response) => {
 export const updateReviewHandler = async (req: Request, res: Response) => {
   const { reviewId } = req.params;
   const { rating, content } = req.body;
+  const { id: userId } = req.user;
 
   if (!rating || !content) {
     return sendErrorResponse(res, 400, "Bad request data: missing fields");
@@ -50,6 +51,13 @@ export const updateReviewHandler = async (req: Request, res: Response) => {
 
   const review = await findReviewById(reviewId!, res);
   if (!review) return;
+  if (review.id !== userId) {
+    return sendErrorResponse(
+      res,
+      403,
+      "You do not have permission to update this review"
+    );
+  }
 
   try {
     const updatedReview = await db.review.update({
@@ -69,6 +77,17 @@ export const updateReviewHandler = async (req: Request, res: Response) => {
 
 export const deleteReviewHandler = async (req: Request, res: Response) => {
   const { reviewId } = req.params;
+  const { id: userId } = req.user;
+
+  const review = await findReviewById(reviewId!, res);
+  if (!review) return;
+  if (review.id !== userId) {
+    return sendErrorResponse(
+      res,
+      403,
+      "You do not have permission to delete this review"
+    );
+  }
 
   try {
     await db.review.delete({ where: { id: reviewId } });
