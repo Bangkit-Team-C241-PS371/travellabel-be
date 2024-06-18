@@ -5,6 +5,7 @@ import authRouter from "./auth";
 import locationRouter from "./location";
 import bookmarkRouter from "./bookmark";
 import discussionRouter from "./discussion";
+import profileRouter from "./profile";
 import reviewRouter from "./review";
 
 const APIRouter = Router();
@@ -15,6 +16,7 @@ APIRouter.use("/location", authMiddleware, locationRouter);
 APIRouter.use("/bookmark", authMiddleware, bookmarkRouter);
 APIRouter.use("/discussion", authMiddleware, discussionRouter);
 APIRouter.use("/review", authMiddleware, reviewRouter);
+APIRouter.use("/profile", authMiddleware, profileRouter);
 
 const mainRouter = Router();
 
