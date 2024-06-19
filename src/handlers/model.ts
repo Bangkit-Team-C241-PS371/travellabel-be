@@ -20,7 +20,7 @@ export const getRecommendationHandler = async (req: Request, res: Response) => {
       },
       {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhlZDA1M2NhLThjMWQtNDkwYy04NzliLTA0NmI4OWJmMGJiMSIsImVtYWlsIjoiZHVtbXlwb3N0bWFuMS4xQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiZHVtbXlwb3N0bWFuMSIsImlhdCI6MTcxODgwNTk4OCwibmJmIjoxNzE4ODA1OTI4LCJleHAiOjE3MTg4MDk1ODh9.6-tY9y7NxXlZE0SegkRDPbs9Al-jiPE2SDe3FIILl9Q`,
+          Authorization: `Bearer ${req.token}`,
         },
       }
     );
