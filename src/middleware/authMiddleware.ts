@@ -8,7 +8,8 @@ declare global {
         id: string
         email: string
         username: string
-      }
+      },
+      token: string
     }
   }
 }
@@ -30,6 +31,7 @@ export const authMiddleware = (
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!)
     if (isUserPayload(decoded)) {
       req.user = decoded
+      req.token = token
       next()
     } else {
       return res.status(403).json({
