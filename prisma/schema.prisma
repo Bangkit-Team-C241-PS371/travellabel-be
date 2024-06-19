@@ -41,6 +41,8 @@ model Location {
   lat Decimal
   lon Decimal
 
+  imageUrl String?
+
   // location rating and how many people rated it
   rating Decimal @default(0)
   raters Int     @default(0)
