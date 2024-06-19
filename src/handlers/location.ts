@@ -87,7 +87,8 @@ export const addLocationImageHandler = async (req: Request, res: Response) => {
 }
 
 export const getLocationHandler = async (req: Request, res: Response) => {
-  const { searchQuery, minLat, minLon, maxLat, maxLon } = req.body;
+  // future work: actually validate types
+  const { searchQuery, minLat, minLon, maxLat, maxLon } = req.query as any;
 
   // validate min-max constraints if both min and max are specified
   if (minLon && maxLon && minLon > maxLon) {
@@ -124,7 +125,9 @@ export const getLocationHandler = async (req: Request, res: Response) => {
 
   // add label filter (case insensitive)
   if (searchQuery) {
-    queryFilter["label"] = { contains: searchQuery, mode: "insensitive" };
+    queryFilter["label"] = {
+      contains: searchQuery, mode: "insensitive"
+    };
   }
 
   // add lat filter
