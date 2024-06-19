@@ -2,6 +2,10 @@ import { Request, Response } from "express";
 import { Prisma } from "@prisma/client";
 import { sendErrorResponse } from "~/errors/responseError";
 import { db } from "~/utils/db";
+import { StatusCodes } from "http-status-codes";
+import { IMAGE_MIME_TYPES, uploadFile } from "~/utils/storage";
+import { findLocationById } from "~/services/review";
+import { v4 as uuidv4 } from 'uuid';
 
 export const createLocationHandler = async (req: Request, res: Response) => {
   const { label, description, lat, lon } = req.body;
@@ -43,6 +47,44 @@ export const createLocationHandler = async (req: Request, res: Response) => {
     return sendErrorResponse(res, 500, "Error while creating location");
   }
 };
+
+export const addLocationImageHandler = async (req: Request, res: Response) => {
+  const multipartFile = req.file;
+  if (!multipartFile) {
+    return sendErrorResponse(res, StatusCodes.BAD_REQUEST, "No file uploaded");
+  }
+
+  if (!IMAGE_MIME_TYPES.includes(multipartFile.mimetype)) {
+    return sendErrorResponse(res, StatusCodes.BAD_REQUEST, "Image type must be .gif, .jpg, .jpeg, or .png!");
+  }
+
+  const { locationId } = req.params;
+  await findLocationById(locationId!, res);
+
+  try {
+    // uuid to ensure no collision
+    const fileName = `${uuidv4()}_${multipartFile.originalname}`;
+    const gcsFileUrl = await uploadFile(fileName, multipartFile.mimetype, multipartFile.buffer);
+
+    const updatedLocation = await db.location.update({
+      where: {
+        id: locationId
+      },
+      data: {
+        imageUrl: gcsFileUrl
+      }
+    });
+
+    return res.send({
+      status: "OK",
+      message: "Image for location added successfully",
+      location: updatedLocation
+    });
+  } catch (e: any) {
+    return sendErrorResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, `Error while uploading file: ${e.message ?? "Unknown error"}`)
+  }
+
+}
 
 export const getLocationHandler = async (req: Request, res: Response) => {
   const { searchQuery, minLat, minLon, maxLat, maxLon } = req.body;
