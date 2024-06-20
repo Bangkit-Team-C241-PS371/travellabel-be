@@ -2,6 +2,13 @@
 
 This README.md file provides an overview of the application, stack, development preparation, and deployment steps for the TravelLabel backend.
 
+## Table of Contents
+- [Application Overview](#application-overview)
+- [Tech Stack](#tech-stack)
+- [Application Structure](#application-structure)
+- [Development Preparation](#development-preparation)
+- [Deployment Steps](#deployment-steps)
+
 ## Application Overview
 
 The TravelLabel backend is a RESTful API that serves as the backend for the TravelLabel application. It handles various functionalities such as user authentication & authorization, CRUD, and predictions processing.
