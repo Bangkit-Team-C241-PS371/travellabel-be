@@ -54,7 +54,7 @@ To set up the development environment, follow these steps:
 5. Run the application in development mode (with auto-reload, but no TS type-checking) by using `npm run dev`.
 
 ## Deployment Steps
-
+![Cloud Architecture Diagram](https://ibb.co.com/9tSyfjc)
 Please note that the included CI/CD using GitHub actions is already configured to build and deploy to Cloud Run. The following actions secrets are required for this CI/CD:
 - `GCP_SA_KEY`: Key (JSON format) for the Service Account that will execute the deployment tasks.
 - `IMAGE_TAG`: Image tag to push the built docker image to.
