@@ -141,7 +141,20 @@ export const getReviewPerLocationHandler = async (
   if (!location) return;
 
   try {
-    const reviews = await db.review.findMany({ where: { locationId } });
+    const reviews = await db.review.findMany({
+      where: {
+        locationId
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+      }
+    });
 
     const allReviews = await Promise.all(
       reviews.map((review) => getReviewWithInteractionCounts(review.id))
