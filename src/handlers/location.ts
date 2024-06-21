@@ -185,6 +185,15 @@ export const getDiscussionPerLocationHandler = async (
     where: {
       locationId,
     },
+    include: {
+      creator: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
+    }
   });
 
   return res.send({
