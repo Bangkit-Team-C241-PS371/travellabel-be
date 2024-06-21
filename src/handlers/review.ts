@@ -145,15 +145,6 @@ export const getReviewPerLocationHandler = async (
       where: {
         locationId
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-          },
-        },
-      }
     });
 
     const allReviews = await Promise.all(

@@ -63,6 +63,13 @@ export const getReviewWithInteractionCounts = async (reviewId: string) => {
     },
     include: {
       interactions: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
     },
   });
 
